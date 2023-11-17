@@ -1,3 +1,9 @@
-const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8000";
+const BACKEND_URL = import.meta.env.BACKEND_URL || "http://localhost:8000";
 
-export { BACKEND_URL };
+const config = {
+  BACKEND_URL,
+  EMPLOYEE_LOGIN_ENDPOINT: `${BACKEND_URL}/api/auth/employee/login`,
+  EMPLOYEE_LOGOUT_ENDPOINT: `${BACKEND_URL}/api/auth/employee/logout`,
+};
+
+export { config };
