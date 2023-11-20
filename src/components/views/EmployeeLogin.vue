@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import axios from "axios";
-import { config } from "../config/application.config";
+import { config } from "../../config/application.config.js";
 </script>
 
 <template>
   <main>
     <div class="flex items-center justify-center min-h-screen bg-gray-100">
       <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h2 class="text-2xl font-semibold mb-4">ログイン画面</h2>
+        <h2 class="text-2xl font-semibold mb-4">従業員ログイン画面</h2>
 
         <p v-if="isBackendError" class="text-red-600 mb-4">
           {{ backendErrorMessage }}
@@ -53,10 +53,10 @@ import { config } from "../config/application.config";
             </button>
             <button
               type="button"
-              v-on:click="cancel"
+              v-on:click="clear"
               class="text-gray-600 hover:text-gray-800 hover:bg-red-300 px-4 py-2 rounded focus:outline-none"
             >
-              キャンセル
+              クリア
             </button>
           </div>
         </form>
@@ -80,6 +80,9 @@ export default {
       const user_id = this.user_id;
       const password = this.password;
       const EMPLOYEE_LOGIN_ENDPOINT = config.EMPLOYEE_LOGIN_ENDPOINT;
+
+      this.isBackendError = false;
+      this.backendErrorMessage = "";
 
       let response;
       try {
@@ -108,19 +111,17 @@ export default {
         }
       }
 
-      // ログインに成功した場合、Vuexという状態管理に従業員情報を保存してヘッダーに表示、入力画面にリダイレクトを行う。
+      // TODO ログインに成功した場合、Vuexという状態管理に従業員情報を保存してヘッダーに表示、入力画面にリダイレクトを行う。
       this.isBackendError = false;
       this.backendErrorMessage = "";
       window.alert(response?.data.message);
     },
-    async cancel() {
-      // キャンセルのロジックをここに追加
-      console.log("Login canceled");
+    clear() {
+      this.user_id = "";
+      this.password = "";
+      this.isBackendError = false;
+      this.backendErrorMessage = "";
     },
   },
 };
 </script>
-
-<style scoped>
-/* 任意のスタイリングを追加 */
-</style>
