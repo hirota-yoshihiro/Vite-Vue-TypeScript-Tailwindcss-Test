@@ -19,49 +19,32 @@
     </select>
   </div>
 
-  <!-- 4. プロジェクトID -->
+  <!-- 4. プロジェクト詳細 -->
   <div class="mb-4">
     <label for="project_id" class="block text-gray-700 text-sm font-bold mb-2"
-      >プロジェクトID:</label
+      >プロジェクト詳細:</label
     >
-    <select
-      v-model="projectId"
-      id="project_id"
-      name="project_id"
-      class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
-    >
-      <!-- プロジェクトリストの表示処理は省略 -->
-    </select>
-  </div>
 
-  <!-- 5. プロジェクト名 -->
-  <div class="mb-4">
-    <label for="project_name" class="block text-gray-700 text-sm font-bold mb-2"
-      >プロジェクト名:</label
-    >
-    <input
-      v-model="projectName"
-      type="text"
-      id="project_name"
-      name="project_name"
-      class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
-      readonly
-    />
-  </div>
+    <div class="flex justify-between">
+      <!-- 5. プロジェクトID 読み取り専用 -->
+      <input
+        v-model="projectId"
+        id="project_id"
+        name="project_id"
+        class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500 mr-4"
+        readonly
+      />
 
-  <!-- 6. プロジェクト時間 -->
-  <div class="mb-4">
-    <label for="project_time" class="block text-gray-700 text-sm font-bold mb-2"
-      >プロジェクト時間:</label
-    >
-    <input
-      v-model="projectTime"
-      type="number"
-      step="0.5"
-      id="project_time"
-      name="project_time"
-      class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
-    />
+      <!-- 6. プロジェクト名 読み取り専用 -->
+      <input
+        v-model="projectName"
+        type="text"
+        id="project_name"
+        name="project_name"
+        class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
+        readonly
+      />
+    </div>
   </div>
 
   <!-- 7. 「+」ボタン -->
