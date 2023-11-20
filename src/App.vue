@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import Header from "./components/header/Header.vue";
-import Footer from "./components/footer/Footer.vue";
-import EmployeeLogin from "./components/views/EmployeeLogin.vue";
+import Header from "./components/views/header/Header.vue";
+import Footer from "./components/views/footer/Footer.vue";
 </script>
 
 <template>
   <Header></Header>
-  <EmployeeLogin />
+  <router-view />
   <Footer></Footer>
 </template>
 
