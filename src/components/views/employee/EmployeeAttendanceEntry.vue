@@ -13,7 +13,7 @@
             <div class="mr-4">
               <Datepicker
                 v-model="startingDate"
-                :format="format"
+                :format="formatDate"
                 locale="jp"
                 auto-apply
               ></Datepicker>
@@ -23,7 +23,7 @@
             <div>
               <Datepicker
                 v-model="finalDate"
-                :format="format"
+                :format="formatDate"
                 locale="jp"
                 auto-apply
               ></Datepicker>
@@ -238,7 +238,7 @@
           </button>
           <button
             type="button"
-            v-on:click="clear"
+            v-on:click="clearForm"
             class="text-gray-600 hover:text-gray-800 hover:bg-red-300 px-4 py-2 rounded focus:outline-none"
           >
             キャンセル
@@ -251,29 +251,20 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import axios from "axios";
 import Datepicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 
-const startingDate = ref(new Date());
-const finalDate = ref(new Date());
-const projectCategory = ref("");
-const projectId = ref<null | number>(null);
-const projectName = ref("");
-const projectTime = ref(0.0);
-const overtime = ref(0.0);
-const lateNightOvertime = ref(0.0);
-const holidayWorkTime = ref(0.0);
-const salariedAndAbsenteeismAndPublicHolidayTime = ref(0.0);
-const companyClosureTime = ref(0.0);
-
-const submitAttendanceData = () => {
-  // TODO プレビュー画面へ遷移する。
-};
-
-const generateSelectOptionsBy05increments = (length: number) => {
-  return Array.from({ length }, (_, index) => (index * 0.5).toFixed(1));
-};
+let startingDate = ref(new Date());
+let finalDate = ref(new Date());
+let projectCategory = ref("");
+let projectId = ref<null | number>(null);
+let projectName = ref("");
+let projectTime = ref(0.0);
+let overtime = ref(0.0);
+let lateNightOvertime = ref(0.0);
+let holidayWorkTime = ref(0.0);
+let salariedAndAbsenteeismAndPublicHolidayTime = ref(0.0);
+let companyClosureTime = ref(0.0);
 
 // TODO 初期化値の0.0が、optionタグの初期値として設定されない。
 const projectHours = generateSelectOptionsBy05increments(49);
@@ -281,14 +272,36 @@ const overtimeHours = generateSelectOptionsBy05increments(17);
 const lateNightHours = generateSelectOptionsBy05increments(15);
 const holidayWorkHours = generateSelectOptionsBy05increments(49);
 const salariedAndAbsenteeismAndPublicHolidayHours =
-  generateSelectOptionsBy05increments(2);
+  generateSelectOptionsBy05increments(3);
 const companyClosureHours = generateSelectOptionsBy05increments(17);
 
-const format = (date: Date) => {
+function formatDate(date: Date) {
   const day = date.getDate();
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
 
   return `${year}/${month}/${day}`;
-};
+}
+
+function generateSelectOptionsBy05increments(length: number) {
+  return Array.from({ length }, (_, index) => (index * 0.5).toFixed(1));
+}
+
+function submitAttendanceData() {
+  // TODO プレビュー画面へ遷移する。
+}
+
+function clearForm() {
+  startingDate.value = new Date();
+  finalDate.value = new Date();
+  projectCategory.value = "";
+  projectId.value = null;
+  projectName.value = "";
+  projectTime.value = 0.0;
+  overtime.value = 0.0;
+  lateNightOvertime.value = 0.0;
+  holidayWorkTime.value = 0.0;
+  salariedAndAbsenteeismAndPublicHolidayTime.value = 0.0;
+  companyClosureTime.value = 0.0;
+}
 </script>
