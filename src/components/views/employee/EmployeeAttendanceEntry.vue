@@ -241,7 +241,7 @@
             v-on:click="clearForm"
             class="text-gray-600 hover:text-gray-800 hover:bg-red-300 px-4 py-2 rounded focus:outline-none"
           >
-            キャンセル
+            クリア
           </button>
         </div>
       </form>
