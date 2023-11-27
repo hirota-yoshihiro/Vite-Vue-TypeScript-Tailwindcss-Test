@@ -1,37 +1,41 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-import EmployeeLogin from "../components/views/employee/EmployeeLogin.vue";
-import EmployeeAttendanceEntry from "../components/views/employee/EmployeeAttendanceEntry.vue";
-import ListOfEmployeeProjects from "../layouts/ListOfEmployeeProjects.vue";
+// Employee Relation Routes
+import EmployeeLogin from "@/components/views/employee/EmployeeLogin.vue";
+import EmployeeDashBoard from "@/layouts/dashboard/Dashboard.vue";
+import EmployeeListOfProjects from "@/components/views/employee/EmployeeListOfProjects.vue";
+import EmployeeAttendanceEntry from "@/components/views/employee/EmployeeAttendanceEntry.vue";
 
-import AdminLogin from "../components/views/admin/AdminLogin.vue";
-import AdminAttendanceEntry from "../components/views/admin/AdminAttendanceEntry.vue";
+// Admin Relation Routes
+import AdminLogin from "@/components/views/admin/AdminLogin.vue";
 
 const routes = [
   {
-    path: "/employee/login",
     name: "EmployeeLogin",
+    path: "/employee/login",
     component: EmployeeLogin,
   },
   {
-    path: "/employee/attendance-entry",
-    name: "EmployeeAttendanceEntry",
-    component: EmployeeAttendanceEntry,
-  },
-  {
-    path: "/employee/list-of-projects",
-    name: "ListOfEmployeeProjects",
-    component: ListOfEmployeeProjects,
+    name: "EmployeeDashboard",
+    path: "/employee/dashboard",
+    component: EmployeeDashBoard,
+    children: [
+      {
+        name: "EmployeeListOfProjects",
+        path: "/employee/dashboard/list-of-projects",
+        component: EmployeeListOfProjects,
+      },
+      {
+        name: "EmployeeAttendanceEntry ",
+        path: "/employee/dashboard/attendance-entry",
+        component: EmployeeAttendanceEntry,
+      },
+    ],
   },
   {
     path: "/admin/login",
     name: "AdminLogin",
     component: AdminLogin,
-  },
-  {
-    path: "/admin/attendance-entry",
-    name: "AdminAttendanceEntry",
-    component: AdminAttendanceEntry,
   },
 ];
 
