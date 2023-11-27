@@ -1,12 +1,7 @@
-<script setup lang="ts">
-import Header from "./components/views/header/Header.vue";
-import Footer from "./components/views/footer/Footer.vue";
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <Header></Header>
-  <router-view />
-  <Footer></Footer>
+  <div>
+    <router-view />
+  </div>
 </template>
-
-<style scoped></style>
