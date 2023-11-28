@@ -1,35 +1,10 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
-import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
-import axios from "axios";
 
-import { config } from "@/config/application.config";
 import { useStoreProjects } from "@/stores/projects";
 
 const projectsObj = useStoreProjects();
-const { getProjects } = projectsObj;
 const { projects } = storeToRefs(projectsObj);
-
-const route = useRoute();
-onMounted(async () => {
-  const projectType = route.query.type;
-  const LIST_OF_PROJECTS_ENDPOINT = config.LIST_OF_PROJECTS_ENDPOINT;
-
-  let response;
-  try {
-    response = await axios.get(
-      `${LIST_OF_PROJECTS_ENDPOINT}?type=${projectType}`
-    );
-  } catch (err: any) {
-    const statusCode = err.response.status;
-    if (statusCode >= 500) {
-      window.alert(err.response.data);
-      return;
-    }
-  }
-  getProjects(response?.data);
-});
 </script>
 
 <template>

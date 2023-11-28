@@ -78,11 +78,16 @@ const fetchProjects = async (projectType: string) => {
 };
 
 const logout = async () => {
-  debugger;
   const EMPLOYEE_LOGOUT_ENDPOINT = config.EMPLOYEE_LOGOUT_ENDPOINT;
 
   try {
-    await axios.get(EMPLOYEE_LOGOUT_ENDPOINT);
+    await axios.post(
+      EMPLOYEE_LOGOUT_ENDPOINT,
+      {},
+      {
+        withCredentials: true,
+      }
+    );
   } catch (err: any) {
     const statusCode = err.response.status;
     if (statusCode >= 500) {
@@ -247,18 +252,15 @@ const logout = async () => {
             >
               <div class="py-1 text-left" role="none">
                 <!-- Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" -->
-
-                <form method="GET" v-on:click="logout" role="none">
-                  <button
-                    type="submit"
-                    class="text-gray-700 block w-full px-4 py-2 text-left text-sm"
-                    role="menuitem"
-                    tabindex="-1"
-                    id="menu-item-3"
-                  >
-                    ログアウト
-                  </button>
-                </form>
+                <button
+                  v-on:click="logout"
+                  class="text-gray-700 block w-full px-4 py-2 text-left text-sm"
+                  role="menuitem"
+                  tabindex="-1"
+                  id="menu-item-3"
+                >
+                  ログアウト
+                </button>
               </div>
             </div>
           </div>
