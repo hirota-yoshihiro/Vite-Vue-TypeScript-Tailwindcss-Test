@@ -43,7 +43,7 @@ const lists = reactive([
   },
 ]);
 
-const toggleDrop = () => {
+const toggleProfileMenu = () => {
   showDropDown.value = !showDropDown.value;
 };
 
@@ -170,7 +170,7 @@ const logout = async () => {
         </div>
         <!-- Search bar -->
 
-        <div class="w-[calc(100%-30px)] flex">
+        <div class="w-[calc(100%-30px)] flex z-0">
           <div class="w-[calc(100%-200px)] flex justify-center">
             <!-- Search bar -->
             <form class="flex items-center w-[500px]">
@@ -223,10 +223,10 @@ const logout = async () => {
           </div>
 
           <!-- User login -->
-          <div class="w-[200px]">
+          <div class="w-[200px] relative z-0">
             <div
               class="flex items-center justify-start space-x-4"
-              @click="toggleDrop"
+              v-on:click="toggleProfileMenu"
             >
               <img
                 class="w-10 h-10 rounded-full border-2 border-gray-50"
@@ -251,7 +251,6 @@ const logout = async () => {
               tabindex="-1"
             >
               <div class="py-1 text-left" role="none">
-                <!-- Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" -->
                 <button
                   v-on:click="logout"
                   class="text-gray-700 block w-full px-4 py-2 text-left text-sm"
