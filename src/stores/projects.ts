@@ -12,9 +12,7 @@ export const useStoreProjects = defineStore("projects", {
   }),
   actions: {
     getProjects(projects: any) {
-      console.log(this.projects);
       this.projects = projects;
-      console.log(this.projects);
     },
   },
 });

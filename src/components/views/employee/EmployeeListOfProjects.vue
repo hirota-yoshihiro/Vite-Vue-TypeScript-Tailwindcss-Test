@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
+import Cookies from "js-cookie";
 
 import { useStoreProjects } from "@/stores/projects";
 
@@ -26,56 +27,48 @@ const checkOperationOfCookie = (event: Event, project: Project) => {
   }
 };
 
-const PROJECT_NAME_LIST = {
-  estimation: "_estimationList",
-  customer: "_customerList",
-  development: "_developmentList",
-  inProducts: "_inProductsList",
-};
-
-type ProjectType = "estimation" | "customer" | "development" | "inProducts";
-
+const _PROJECTS = "_projects";
 const setCookie = (project: Project) => {
-  let cookies: string = "";
-  let period: number = 0;
-  let expire: Date;
+  // 1. 現在のcookieに保存されている_projectsの値を取得する。
 
-  // cookiesに格納されている同様のprojectのオブジェクトが存在しないか確認を行う。
-  const projectType: ProjectType = project.type as ProjectType;
-  const cookieName = PROJECT_NAME_LIST[`${projectType}`];
-
-  // cookieにそれぞれのPROJECT_NAME_LISTに対応した値が一つでも保存されていればtrue、なければfalseの条件分岐を行う。
-  // if ()
-  // cookies = `${cookieName}=${JSON.stringify(project)};`;
-  cookies = `${cookieName}=${JSON.stringify(project)};`;
-
-  period = 5; // 保存日数 5日
-  expire = new Date();
-  expire.setTime(expire.getTime() + 1000 * 60 * 60 * 24 * period);
-  expire.toUTCString();
-  cookies += `expires=${expire};`;
-
+  let _projectsInCookie: any = Cookies.get(_PROJECTS);
   debugger;
-  document.cookie += cookies;
+  if (!_projectsInCookie) _projectsInCookie = JSON.stringify([]);
+  const parseProjects: Project[] = JSON.parse(_projectsInCookie!);
+
+  // 2. もしcookieに_projectsという値が保存されていない場合は_projectsというキーと、引数に渡ってくるproject(オブジェクト)の値を配列の要素の初期値として設定する。
+  // 3. cookieから_projectsの値が取得できた場合、現在格納されている配列に引数に渡ってくるprojectをpushする。
+  const existParseProject = parseProjects.length === 0;
+  if (existParseProject) {
+    const initValue = JSON.stringify([project]);
+    Cookies.set(_PROJECTS, initValue);
+  } else {
+    // 4. deleteCookieの関数を通らずにチェックボックスが押された場合は値が重複するので、削除するロジックを追加する。
+    const isExist =
+      parseProjects.findIndex((element) => element.id === project.id) !== -1;
+    if (isExist) {
+      deleteCookie(project);
+      return;
+    }
+    // 4の実装ここまで
+
+    parseProjects.push(project);
+    Cookies.set(_PROJECTS, JSON.stringify(parseProjects));
+  }
 };
 
 const deleteCookie = (project: Project) => {
-  let cookies = "";
-  let cookieArray = new Array();
-  let result = new Array();
+  // 1. 現在のcookieに保存されている_projectsの値を取得する。
 
   debugger;
-  cookies = document.cookie;
+  const _projectsInCookie = Cookies.get(_PROJECTS);
+  const parseProjects: Project[] = JSON.parse(_projectsInCookie!);
 
-  if (cookies) {
-    cookieArray = cookies.split(";");
+  // 2. cookieに保存されている_projectsの配列からIDが一致するオブジェクトを検索して、ヒットした場合にそのオブジェクトのindexがわかるので、その配列から当該オブジェクトを削除する。
 
-    cookieArray.forEach((data) => {
-      data = data.split("=");
-      result[data[0]] = JSON.parse(data[1]);
-      console.log(result);
-    });
-  }
+  const index = parseProjects.findIndex((element) => element.id === project.id);
+  parseProjects.splice(index, 1);
+  Cookies.set(_PROJECTS, JSON.stringify(parseProjects));
 };
 </script>
 
