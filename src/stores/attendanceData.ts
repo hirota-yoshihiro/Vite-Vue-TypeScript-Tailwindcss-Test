@@ -19,28 +19,30 @@ type AttendanceData = {
   ];
 };
 
-export const useStoreProjects = defineStore("attendanceData", {
-  state: (): AttendanceData => ({
-    projectCategory: "",
-    startingDate: new Date(),
-    finalDate: new Date(),
-    overtime: 0.0,
-    lateNightOvertime: 0.0,
-    holidayWorkTime: 0.0,
-    salariedAndAbsenteeismAndPublicHolidayTime: 0.0,
-    companyClosureTime: 0.0,
-    projects: [
-      {
-        id: "",
-        name: "",
-        type: "",
-        time: 0,
-      },
-    ],
+export const useStoreAttendanceData = defineStore("attendanceData", {
+  state: () => ({
+    attendanceData: {
+      projectCategory: "",
+      startingDate: new Date(),
+      finalDate: new Date(),
+      overtime: 0.0,
+      lateNightOvertime: 0.0,
+      holidayWorkTime: 0.0,
+      salariedAndAbsenteeismAndPublicHolidayTime: 0.0,
+      companyClosureTime: 0.0,
+      projects: [
+        {
+          id: "",
+          name: "",
+          type: "",
+          time: 0,
+        },
+      ],
+    },
   }),
   actions: {
-    getProjects(projects: any) {
-      this.projects = projects;
+    getAttendanceData(attendanceData: AttendanceData) {
+      this.attendanceData = attendanceData;
     },
   },
 });

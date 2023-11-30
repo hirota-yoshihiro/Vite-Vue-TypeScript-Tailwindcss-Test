@@ -32,6 +32,7 @@ const routes = [
       },
     ],
   },
+
   {
     path: "/admin/login",
     name: "AdminLogin",
