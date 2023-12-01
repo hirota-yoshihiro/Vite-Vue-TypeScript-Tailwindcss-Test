@@ -3,18 +3,16 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 
-import { config } from "../../../config/application.config.js";
+import { config } from "@/config/application.config.js";
+import { useStoreEmployee } from "@/stores/employee";
 
 const router = useRouter();
-
 const user_id = ref("");
 const password = ref("");
 const isBackendError = ref(false);
 const backendErrorMessage = ref("");
-
-const transitionToAttendanceEntryScreen = () => {
-  router.push("/employee/dashboard/attendance-entry");
-};
+const storeEmployee = useStoreEmployee();
+const { getEmployee } = storeEmployee;
 
 const clear = () => {
   user_id.value = "";
@@ -56,8 +54,17 @@ const login = async () => {
     }
   }
 
-  // TODO ログインに成功した場合、Vuexという状態管理に従業員情報を保存してヘッダーに表示、入力画面にページ遷移を行う。
+  saveEmployeeToPinia(response?.data);
+
   transitionToAttendanceEntryScreen();
+};
+
+const saveEmployeeToPinia = (response: any) => {
+  getEmployee(response);
+};
+
+const transitionToAttendanceEntryScreen = () => {
+  router.push("/employee/dashboard/attendance-entry");
 };
 </script>
 

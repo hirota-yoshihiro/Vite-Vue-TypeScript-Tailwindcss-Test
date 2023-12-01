@@ -1,20 +1,24 @@
 <script setup lang="ts">
 import { ref, reactive } from "vue";
+import { storeToRefs } from "pinia";
 import axios from "axios";
 import Cookies from "js-cookie";
 import Datepicker from "@vuepic/vue-datepicker";
 
+import { config } from "@/config/application.config";
+import { useStoreEmployee } from "@/stores/employee";
+
 import "@vuepic/vue-datepicker/dist/main.css";
 
 type AttendanceData = {
-  projectCategory: any;
-  startingDate: Date;
+  absenteeismTime: number;
+  annualVacationTime: number;
   finalDate: Date;
-  overtime: number;
-  lateNightOvertime: number;
   holidayWorkTime: number;
-  salariedAndAbsenteeismAndPublicHolidayTime: number;
-  companyClosureTime: number;
+  lateNightOvertime: number;
+  overtime: number;
+  publicHolidayTime: number;
+  startingDate: Date;
   projects: [
     {
       id: string;
@@ -25,15 +29,18 @@ type AttendanceData = {
   ];
 };
 
+const storeEmployee = useStoreEmployee();
+const { employee } = storeToRefs(storeEmployee);
+
 const attendanceData: AttendanceData = reactive({
-  projectCategory: ref(""),
-  startingDate: ref(new Date()),
+  absenteeismTime: ref(0.0),
+  annualVacationTime: ref(0.0),
   finalDate: ref(new Date()),
-  overtime: ref(0.0),
-  lateNightOvertime: ref(0.0),
   holidayWorkTime: ref(0.0),
-  salariedAndAbsenteeismAndPublicHolidayTime: ref(0.0),
-  companyClosureTime: ref(0.0),
+  lateNightOvertime: ref(0.0),
+  overtime: ref(0.0),
+  publicHolidayTime: ref(0.0),
+  startingDate: ref(new Date()),
   projects: [
     {
       id: "",
@@ -43,15 +50,22 @@ const attendanceData: AttendanceData = reactive({
     },
   ],
 });
+const projectHours = ref([""]);
+const overtimeHours = ref([""]);
+const lateNightHours = ref([""]);
+const holidayWorkHours = ref([""]);
+const annualVacationAndAbsenteeismAndPublicHolidayHours = ref([""]);
 
-// TODO 初期化値の0.0が、optionタグの初期値として設定されない。
-const projectHours = generateSelectOptionsBy05increments(49);
-const overtimeHours = generateSelectOptionsBy05increments(17);
-const lateNightHours = generateSelectOptionsBy05increments(15);
-const holidayWorkHours = generateSelectOptionsBy05increments(49);
-const salariedAndAbsenteeismAndPublicHolidayHours =
-  generateSelectOptionsBy05increments(3);
-const companyClosureHours = generateSelectOptionsBy05increments(17);
+selectInit();
+function selectInit() {
+  // TODO 初期化値の0.0が、optionタグの初期値として設定されない。
+  projectHours.value = generateSelectOptionsBy05increments(49);
+  overtimeHours.value = generateSelectOptionsBy05increments(17);
+  lateNightHours.value = generateSelectOptionsBy05increments(15);
+  holidayWorkHours.value = generateSelectOptionsBy05increments(49);
+  annualVacationAndAbsenteeismAndPublicHolidayHours.value =
+    generateSelectOptionsBy05increments(3);
+}
 
 insertProjectsFromCookie();
 function insertProjectsFromCookie() {
@@ -84,16 +98,6 @@ function formatDate(date: Date) {
   return `${year}/${month}/${day}`;
 }
 
-function selectVacation(type: "salaried" | "absenteeism" | "publicHoliday") {
-  const vacationList = {
-    salaried: "欠勤",
-    absenteeism: "欠勤",
-    publicHoliday: "公休",
-  };
-
-  return vacationList[type];
-}
-
 function selectProjectType(
   type: "estimation" | "development" | "inProducts" | "customer"
 ) {
@@ -114,19 +118,43 @@ function generateSelectOptionsBy05increments(length: number) {
 const isAttendancePage = ref(true);
 function moveToPreview() {
   // attendanceDataのバリデーションチェック
-  validateAttendanceData();
+  validateAttendanceData(attendanceData);
   isAttendancePage.value = false;
 }
 
-function validateAttendanceData() {}
+function validateAttendanceData(data: AttendanceData) {}
 
 function backToAttendancePage() {
   isAttendancePage.value = true;
 }
 
-function submitAttendanceData() {
+async function submitAttendanceData() {
   // バックエンド側へattendanceDataを送信
   if (!window.confirm("勤怠入力をサーバーへ送信しても宜しいですか？")) return;
+
+  const submitdata = {
+    attendanceEntry: {
+      absenteeismTime: attendanceData.absenteeismTime,
+      annualVacationTime: attendanceData.annualVacationTime,
+      finalDate: attendanceData.finalDate,
+      holidayWorkTime: attendanceData.holidayWorkTime,
+      lateNightOvertime: attendanceData.lateNightOvertime,
+      overTime: attendanceData.overtime,
+      publicHolidayTime: attendanceData.publicHolidayTime,
+      startingDate: attendanceData.startingDate,
+    },
+    projects: attendanceData.projects,
+    employeeId: employee.value.id,
+  };
+  let response;
+  try {
+    response = await axios.post(
+      `${config.BACKEND_URL}/api/attendance`,
+      submitdata
+    );
+  } catch (e) {}
+
+  console.log(response);
 }
 
 function clearForm() {
@@ -135,8 +163,9 @@ function clearForm() {
   attendanceData.overtime = 0.0;
   attendanceData.lateNightOvertime = 0.0;
   attendanceData.holidayWorkTime = 0.0;
-  attendanceData.salariedAndAbsenteeismAndPublicHolidayTime = 0.0;
-  attendanceData.companyClosureTime = 0.0;
+  attendanceData.annualVacationTime = 0.0;
+  attendanceData.absenteeismTime = 0.0;
+  attendanceData.publicHolidayTime = 0.0;
 }
 </script>
 
@@ -176,130 +205,147 @@ function clearForm() {
                   </div>
                 </div>
 
-                <div class="flex justify-between">
-                  <!-- 8. 残業 -->
-                  <div class="mb-4 w-3/12">
-                    <label
-                      for="project_category"
-                      class="block text-gray-700 text-sm font-bold mb-2"
-                      >残業:</label
-                    >
-                    <select
-                      v-model="attendanceData.overtime"
-                      id="project_category"
-                      name="project_category"
-                      class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
-                    >
-                      <option
-                        v-for="hour in overtimeHours"
-                        v-bind:key="hour"
-                        v-bind:value="hour"
+                <div>
+                  <div class="flex justify-between">
+                    <!-- 8. 残業 -->
+                    <div class="mb-4 w-3/12">
+                      <label
+                        for="project_category"
+                        class="block text-gray-700 text-sm font-bold mb-2"
+                        >残業:</label
                       >
-                        {{ hour }}
-                      </option>
-                    </select>
+                      <select
+                        v-model="attendanceData.overtime"
+                        id="project_category"
+                        name="project_category"
+                        class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
+                      >
+                        <option
+                          v-for="hour in overtimeHours"
+                          v-bind:key="hour"
+                          v-bind:value="hour"
+                        >
+                          {{ hour }}
+                        </option>
+                      </select>
+                    </div>
+
+                    <!-- 9. 深夜残業 -->
+                    <div class="mb-4 w-3/12">
+                      <label
+                        for="project_category"
+                        class="block text-gray-700 text-sm font-bold mb-2"
+                        >深夜残業:</label
+                      >
+                      <select
+                        v-model="attendanceData.lateNightOvertime"
+                        id="project_category"
+                        name="project_category"
+                        class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
+                      >
+                        <option
+                          v-for="hour in lateNightHours"
+                          v-bind:key="hour"
+                          v-bind:value="hour"
+                        >
+                          {{ hour }}
+                        </option>
+                      </select>
+                    </div>
+
+                    <!-- 10. 休日出勤 -->
+                    <div class="mb-4 w-3/12">
+                      <label
+                        for="project_category"
+                        class="block text-gray-700 text-sm font-bold mb-2"
+                        >休日出勤:</label
+                      >
+                      <select
+                        v-model="attendanceData.holidayWorkTime"
+                        id="project_category"
+                        name="project_category"
+                        class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
+                      >
+                        <option
+                          v-for="hour in annualVacationAndAbsenteeismAndPublicHolidayHours"
+                          v-bind:key="hour"
+                          v-bind:value="hour"
+                        >
+                          {{ hour }}
+                        </option>
+                      </select>
+                    </div>
                   </div>
 
-                  <!-- 9. 深夜残業 -->
-                  <div class="mb-4 w-3/12">
-                    <label
-                      for="project_category"
-                      class="block text-gray-700 text-sm font-bold mb-2"
-                      >深夜残業:</label
-                    >
-                    <select
-                      v-model="attendanceData.lateNightOvertime"
-                      id="project_category"
-                      name="project_category"
-                      class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
-                    >
-                      <option
-                        v-for="hour in lateNightHours"
-                        v-bind:key="hour"
-                        v-bind:value="hour"
+                  <div class="flex justify-between">
+                    <!-- 11. 年休 -->
+                    <div class="mb-4 w-3/12">
+                      <label
+                        for="project_category"
+                        class="block text-gray-700 text-sm font-bold mb-2"
+                        >年休:</label
                       >
-                        {{ hour }}
-                      </option>
-                    </select>
-                  </div>
-
-                  <!-- 10. 休日出勤 -->
-                  <div class="mb-4 w-3/12">
-                    <label
-                      for="project_category"
-                      class="block text-gray-700 text-sm font-bold mb-2"
-                      >休日出勤:</label
-                    >
-                    <select
-                      v-model="attendanceData.holidayWorkTime"
-                      id="project_category"
-                      name="project_category"
-                      class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
-                    >
-                      <option
-                        v-for="hour in holidayWorkHours"
-                        v-bind:key="hour"
-                        v-bind:value="hour"
+                      <select
+                        v-model="attendanceData.annualVacationTime"
+                        id="project_category"
+                        name="project_category"
+                        class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
                       >
-                        {{ hour }}
-                      </option>
-                    </select>
-                  </div>
-                </div>
+                        <option
+                          v-for="hour in annualVacationAndAbsenteeismAndPublicHolidayHours"
+                          v-bind:key="hour"
+                          v-bind:value="hour"
+                        >
+                          {{ hour }}
+                        </option>
+                      </select>
+                    </div>
 
-                <div class="flex justify-around">
-                  <!-- 11. 有給、欠勤、公休 -->
-                  <div class="mb-4 w-3/12">
-                    <select
-                      v-model="attendanceData.projectCategory"
-                      id="project_category"
-                      name="project_category"
-                      class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
-                    >
-                      <option value="salaried">有給</option>
-                      <option value="absenteeism">欠勤</option>
-                      <option value="publicHoliday">公休</option>
-                    </select>
-
-                    <select
-                      v-model="
-                        attendanceData.salariedAndAbsenteeismAndPublicHolidayTime
-                      "
-                      id="project_category"
-                      name="project_category"
-                      class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
-                    >
-                      <option
-                        v-for="hour in salariedAndAbsenteeismAndPublicHolidayHours"
-                        v-bind:key="hour"
-                        v-bind:value="hour"
+                    <!-- 12. 欠勤 -->
+                    <div class="mb-4 w-3/12">
+                      <label
+                        for="project_category"
+                        class="block text-gray-700 text-sm font-bold mb-2"
+                        >欠勤:</label
                       >
-                        {{ hour }}
-                      </option>
-                    </select>
-                  </div>
-
-                  <!-- 12. 休業 -->
-                  <div class="mb-4 w-3/12">
-                    <label
-                      for="project_category"
-                      class="block text-gray-700 text-sm font-bold mb-2"
-                      >休業:</label
-                    >
-                    <select
-                      v-model="attendanceData.companyClosureTime"
-                      id="project_category"
-                      name="project_category"
-                      class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
-                    >
-                      <option
-                        v-for="hour in companyClosureHours"
-                        v-bind:key="hour"
-                        v-bind:value="hour"
+                      <select
+                        v-model="attendanceData.absenteeismTime"
+                        id="project_category"
+                        name="project_category"
+                        class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
                       >
-                        {{ hour }}
-                      </option>
-                    </select>
+                        <option
+                          v-for="hour in annualVacationAndAbsenteeismAndPublicHolidayHours"
+                          v-bind:key="hour"
+                          v-bind:value="hour"
+                        >
+                          {{ hour }}
+                        </option>
+                      </select>
+                    </div>
+
+                    <!-- 13. 公休 -->
+                    <div class="mb-4 w-3/12">
+                      <label
+                        for="project_category"
+                        class="block text-gray-700 text-sm font-bold mb-2"
+                        >公休:</label
+                      >
+                      <select
+                        v-model="attendanceData.publicHolidayTime"
+                        id="project_category"
+                        name="project_category"
+                        class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
+                      >
+                        <option
+                          v-for="hour in annualVacationAndAbsenteeismAndPublicHolidayHours"
+                          v-bind:key="hour"
+                          v-bind:value="hour"
+                        >
+                          {{ hour }}
+                        </option>
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -455,61 +501,75 @@ function clearForm() {
                   </div>
                 </div>
 
-                <div class="flex justify-between">
-                  <!-- 8. 残業 -->
-                  <div class="mb-4 w-3/12">
-                    <label
-                      for="project_category"
-                      class="block text-gray-700 text-sm font-bold mb-2"
-                      >残業:</label
-                    >
-                    <span readonly>{{ attendanceData.overtime }}</span>
+                <div>
+                  <div class="flex justify-between">
+                    <!-- 8. 残業 -->
+                    <div class="mb-4 w-3/12">
+                      <label
+                        for="project_category"
+                        class="block text-gray-700 text-sm font-bold mb-2"
+                        >残業:</label
+                      >
+                      <span readonly>{{ attendanceData.overtime }}</span>
+                    </div>
+
+                    <!-- 9. 深夜残業 -->
+                    <div class="mb-4 w-3/12">
+                      <label
+                        for="project_category"
+                        class="block text-gray-700 text-sm font-bold mb-2"
+                        >深夜残業:</label
+                      >
+                      <span readonly>{{
+                        attendanceData.lateNightOvertime
+                      }}</span>
+                    </div>
+
+                    <!-- 10. 休日出勤 -->
+                    <div class="mb-4 w-3/12">
+                      <label
+                        for="project_category"
+                        class="block text-gray-700 text-sm font-bold mb-2"
+                        >休日出勤:</label
+                      >
+                      <span readonly>{{ attendanceData.holidayWorkTime }}</span>
+                    </div>
                   </div>
 
-                  <!-- 9. 深夜残業 -->
-                  <div class="mb-4 w-3/12">
-                    <label
-                      for="project_category"
-                      class="block text-gray-700 text-sm font-bold mb-2"
-                      >深夜残業:</label
-                    >
-                    <span readonly>{{ attendanceData.lateNightOvertime }}</span>
-                  </div>
+                  <div class="flex justify-between">
+                    <!-- 11. 年休 -->
+                    <div class="mb-4 w-3/12">
+                      <label
+                        for="project_category"
+                        class="block text-gray-700 text-sm font-bold mb-2"
+                        >年休:</label
+                      >
+                      <span readonly>{{
+                        attendanceData.annualVacationTime
+                      }}</span>
+                    </div>
 
-                  <!-- 10. 休日出勤 -->
-                  <div class="mb-4 w-3/12">
-                    <label
-                      for="project_category"
-                      class="block text-gray-700 text-sm font-bold mb-2"
-                      >休日出勤:</label
-                    >
-                    <span readonly>{{ attendanceData.holidayWorkTime }}</span>
-                  </div>
-                </div>
+                    <!-- 12. 欠勤 -->
+                    <div class="mb-4 w-3/12">
+                      <label
+                        for="project_category"
+                        class="block text-gray-700 text-sm font-bold mb-2"
+                        >欠勤:</label
+                      >
+                      <span readonly>{{ attendanceData.absenteeismTime }}</span>
+                    </div>
 
-                <div class="flex justify-around">
-                  <!-- 11. 有給、欠勤、公休 -->
-                  <div class="mb-4 w-3/12">
-                    <span
-                      class="block text-gray-700 text-sm font-bold mb-2"
-                      readonly
-                    >
-                      {{ selectVacation(attendanceData.projectCategory) }}:
-                    </span>
-
-                    <span readonly>{{
-                      attendanceData.salariedAndAbsenteeismAndPublicHolidayTime
-                    }}</span>
-                  </div>
-
-                  <!-- 12. 休業 -->
-                  <div class="mb-4 w-3/12">
-                    <label
-                      for="project_category"
-                      class="block text-gray-700 text-sm font-bold mb-2"
-                      >休業:</label
-                    >
-                    <span readonly>{{ attendanceData.holidayWorkTime }}</span>
+                    <!-- 13. 公休 -->
+                    <div class="mb-4 w-3/12">
+                      <label
+                        for="project_category"
+                        class="block text-gray-700 text-sm font-bold mb-2"
+                        >公休:</label
+                      >
+                      <span readonly>{{
+                        attendanceData.publicHolidayTime
+                      }}</span>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
 import axios from "axios";
 
 import { ChevronDownIcon } from "@heroicons/vue/24/outline";
 
 import { config } from "@/config/application.config";
 import { useStoreProjects } from "@/stores/projects";
+import { useStoreEmployee } from "@/stores/employee";
 
 const router = useRouter();
-const projectsObj = useStoreProjects();
-const { getProjects } = projectsObj;
+const storeProjects = useStoreProjects();
+const { getProjects } = storeProjects;
+const storeEmployee = useStoreEmployee();
+const { employee } = storeToRefs(storeEmployee);
 
 const showSide = ref(true);
 const showDropDown = ref(false);
@@ -234,7 +238,7 @@ const logout = async () => {
                 alt=""
               />
               <div class="font-semibold dark:text-white text-left">
-                <div>広田 祥大</div>
+                <div>{{ employee.name }}</div>
                 <div class="text-xs text-gray-500 dark:text-gray-400">
                   従業員
                 </div>
