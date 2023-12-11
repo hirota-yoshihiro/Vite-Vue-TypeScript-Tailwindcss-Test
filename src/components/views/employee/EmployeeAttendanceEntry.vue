@@ -15,8 +15,8 @@ type AttendanceData = {
   annualVacationTime: number;
   finalDate: Date;
   holidayWorkTime: number;
-  lateNightOvertime: number;
-  overtime: number;
+  lateNightOverTime: number;
+  overTime: number;
   publicHolidayTime: number;
   startingDate: Date;
   projects: [
@@ -37,8 +37,8 @@ const attendanceData: AttendanceData = reactive({
   annualVacationTime: ref(0.0),
   finalDate: ref(new Date()),
   holidayWorkTime: ref(0.0),
-  lateNightOvertime: ref(0.0),
-  overtime: ref(0.0),
+  lateNightOverTime: ref(0.0),
+  overTime: ref(0.0),
   publicHolidayTime: ref(0.0),
   startingDate: ref(new Date()),
   projects: [
@@ -138,8 +138,8 @@ async function submitAttendanceData() {
       annualVacationTime: attendanceData.annualVacationTime,
       finalDate: attendanceData.finalDate,
       holidayWorkTime: attendanceData.holidayWorkTime,
-      lateNightOvertime: attendanceData.lateNightOvertime,
-      overTime: attendanceData.overtime,
+      lateNightOverTime: attendanceData.lateNightOverTime,
+      overTime: attendanceData.overTime,
       publicHolidayTime: attendanceData.publicHolidayTime,
       startingDate: attendanceData.startingDate,
     },
@@ -153,15 +153,13 @@ async function submitAttendanceData() {
       submitdata
     );
   } catch (e) {}
-
-  console.log(response);
 }
 
 function clearForm() {
   attendanceData.startingDate = new Date();
   attendanceData.finalDate = new Date();
-  attendanceData.overtime = 0.0;
-  attendanceData.lateNightOvertime = 0.0;
+  attendanceData.overTime = 0.0;
+  attendanceData.lateNightOverTime = 0.0;
   attendanceData.holidayWorkTime = 0.0;
   attendanceData.annualVacationTime = 0.0;
   attendanceData.absenteeismTime = 0.0;
@@ -215,7 +213,7 @@ function clearForm() {
                         >残業:</label
                       >
                       <select
-                        v-model="attendanceData.overtime"
+                        v-model="attendanceData.overTime"
                         id="project_category"
                         name="project_category"
                         class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
@@ -238,7 +236,7 @@ function clearForm() {
                         >深夜残業:</label
                       >
                       <select
-                        v-model="attendanceData.lateNightOvertime"
+                        v-model="attendanceData.lateNightOverTime"
                         id="project_category"
                         name="project_category"
                         class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
@@ -510,7 +508,7 @@ function clearForm() {
                         class="block text-gray-700 text-sm font-bold mb-2"
                         >残業:</label
                       >
-                      <span readonly>{{ attendanceData.overtime }}</span>
+                      <span readonly>{{ attendanceData.overTime }}</span>
                     </div>
 
                     <!-- 9. 深夜残業 -->
@@ -521,7 +519,7 @@ function clearForm() {
                         >深夜残業:</label
                       >
                       <span readonly>{{
-                        attendanceData.lateNightOvertime
+                        attendanceData.lateNightOverTime
                       }}</span>
                     </div>
 

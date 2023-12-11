@@ -32,7 +32,6 @@ const setCookie = (project: Project) => {
   // 1. 現在のcookieに保存されている_projectsの値を取得する。
 
   let _projectsInCookie: any = Cookies.get(_PROJECTS);
-  debugger;
   if (!_projectsInCookie) _projectsInCookie = JSON.stringify([]);
   const parseProjects: Project[] = JSON.parse(_projectsInCookie!);
 
