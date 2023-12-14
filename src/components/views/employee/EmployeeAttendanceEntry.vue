@@ -208,24 +208,15 @@ function clearForm() {
                     <!-- 8. 残業 -->
                     <div class="mb-4 w-3/12">
                       <label
-                        for="project_category"
+                        for="over_time"
                         class="block text-gray-700 text-sm font-bold mb-2"
                         >残業:</label
                       >
-                      <select
-                        v-model="attendanceData.overTime"
-                        id="project_category"
-                        name="project_category"
-                        class="w-full px-3 py-2 border rounded focus:outline-none focus:border-blue-500"
-                      >
-                        <option
-                          v-for="hour in overtimeHours"
-                          v-bind:key="hour"
-                          v-bind:value="hour"
-                        >
-                          {{ hour }}
-                        </option>
-                      </select>
+                      <input
+                        v-bind:value="attendanceData.overTime"
+                        type="text"
+                        class="w-full p-1 text-center text-gray-500 outline rounded-sm"
+                      />
                     </div>
 
                     <!-- 9. 深夜残業 -->
