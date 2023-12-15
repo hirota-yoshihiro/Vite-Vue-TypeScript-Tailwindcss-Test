@@ -4,7 +4,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import EmployeeLogin from "@/components/views/employee/EmployeeLogin.vue";
 import EmployeeDashBoard from "@/layouts/dashboard/Dashboard.vue";
 import EmployeeListOfProjects from "@/components/views/employee/EmployeeListOfProjects.vue";
-import EmployeeAttendanceEntry from "@/components/views/employee/EmployeeAttendanceEntry.vue";
+import EmployeeAttendance from "@/components/views/employee/EmployeeAttendance.vue";
 
 // Admin Relation Routes
 import AdminLogin from "@/components/views/admin/AdminLogin.vue";
@@ -27,12 +27,11 @@ const routes = [
       },
       {
         name: "EmployeeAttendanceEntry ",
-        path: "/employee/dashboard/attendance-entry",
-        component: EmployeeAttendanceEntry,
+        path: "/employee/dashboard/attendance",
+        component: EmployeeAttendance,
       },
     ],
   },
-
   {
     path: "/admin/login",
     name: "AdminLogin",

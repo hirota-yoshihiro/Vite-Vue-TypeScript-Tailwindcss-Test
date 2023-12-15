@@ -43,7 +43,7 @@ const lists = reactive([
   },
   {
     name: "勤怠管理",
-    to: "/employee/dashboard/attendance-entry",
+    to: "/employee/dashboard/attendance",
   },
 ]);
 
